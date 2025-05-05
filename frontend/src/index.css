@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+.mask-logo {
+  -webkit-mask-image: url("/falconAI-transparent.png");
+  mask-image: url("/falconAI-transparent.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.fade-text {
+  -webkit-mask-image: linear-gradient(to left, transparent 10%, black 50%);
+  mask-image: linear-gradient(to left, transparent 10%, black 50%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}

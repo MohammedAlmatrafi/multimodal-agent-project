@@ -1,0 +1,9 @@
+fastapi==0.115.12
+langchain==0.3.24
+langchain_community==0.3.23
+langchain_openai==0.3.14
+python-dotenv==1.1.0
+uvicorn==0.34.2
+openai-whisper
+chromadb
+yt_dlp==2025.3.31
