@@ -4,9 +4,15 @@ import { AnimatePresence } from "motion/react";
 import { useParams, useNavigate } from "react-router-dom";
 import MessageList, { messageList } from "./MessageList";
 import { motion } from "motion/react";
+import MicRecorder from "./MicRecorder";
+import clsx from "clsx";
+import { Loader, Mic, MicOff, Send } from "lucide-react";
+import ChatButton from "./ChatButton";
 
 const Chat = () => {
   const [messages, setMessages] = useState<messageList>([]);
+  const [recording, setRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [input, setInput] = useState("");
   const [postWaiting, setPostWaiting] = useState(false);
   const [getWaiting, setGetWaiting] = useState(false);
@@ -36,7 +42,10 @@ const Chat = () => {
         );
         setGetWaiting(false);
         if (response.ok) {
-          const data = await response.json();
+          const data = (await response.json()) as {
+            chat_id: string;
+            history: messageList;
+          };
           if (data.history && data.history.length > 0) {
             setMessages(data.history);
           }
@@ -50,17 +59,28 @@ const Chat = () => {
     fetchChatHistory();
   }, [chatId]);
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-    const newMessage = input.trim();
+  const handleSubmit = async (msg: string) => {
+    const newMessage = msg.trim();
     if (!newMessage || postWaiting) return;
 
-    if (isNew) setMessages([{ role: "user", content: newMessage }]);
-    else
+    if (isNew) {
+      setMessages([
+        {
+          role: "user",
+          content: newMessage,
+          id: Math.floor(10000 + Math.random() * 90000).toString(),
+        },
+      ]);
+    } else {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: "user", content: newMessage },
+        {
+          role: "user",
+          content: newMessage,
+          id: Math.floor(10000 + Math.random() * 90000).toString(),
+        },
       ]);
+    }
 
     setPostWaiting(true);
     setInput("");
@@ -83,8 +103,15 @@ const Chat = () => {
       credentials: "include",
       body: JSON.stringify({ chat_id: finalChatId, user_message: newMessage }),
     });
-    const data = await response.json();
-    setMessages((prev) => [...prev, { role: "agent", content: data.response }]);
+    const data = (await response.json()) as { response: string; id: string };
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "agent",
+        content: data.response,
+        id: data.id, //random 5 digits + response
+      },
+    ]);
     setPostWaiting(false);
   };
   return (
@@ -120,19 +147,54 @@ const Chat = () => {
         </AnimatePresence>
       </div>
       <form
-        onSubmit={handleSubmit}
-        className="flex justify-between gap-3 border-2 border-zinc-700/10 rounded-full py-1 px-1"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(input);
+        }}
+        className={clsx(
+          "flex justify-between items-center border-2  rounded-full py-1 px-1",
+          isTranscribing ? "border-blue-600/30" : "border-zinc-700/10"
+        )}
       >
         <input
           type="text"
-          placeholder="Ask anything"
+          placeholder={isTranscribing ? "Listening..." : "Ask anything"}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="placeholder-zinc-600/25 outline-0 grow text-xs ml-3"
         />
-        <button className="bg-emerald-600 text-white rounded-full p-2 cursor-pointer hover:opacity-90 active:scale-95">
-          {postWaiting ? "Wait" : "Send"}
-        </button>
+        <div className="relative">
+          <MicRecorder
+            hide={!recording}
+            setTranscribing={setIsTranscribing}
+            submitMsg={handleSubmit}
+          />
+          <ChatButton
+            onClick={() => setRecording((prev) => !prev)}
+            type="button"
+            className="rounded-tr-none rounded-br-none bg-zinc-100 pr-2 text-zinc-400"
+          >
+            {recording ? (
+              <MicOff className="text-red-400" size={20} />
+            ) : (
+              <Mic size={20} />
+            )}
+          </ChatButton>
+        </div>
+        <ChatButton
+          type="submit"
+          className="rounded-tl-none rounded-bl-none pl-2"
+        >
+          {postWaiting ? (
+            <Loader
+              className="animate-spin"
+              style={{ animationDuration: "4s" }}
+              size={20}
+            />
+          ) : (
+            <Send size={20} />
+          )}
+        </ChatButton>
       </form>
     </div>
   );

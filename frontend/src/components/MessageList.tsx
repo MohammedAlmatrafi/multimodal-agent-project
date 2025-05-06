@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { useParams } from "react-router-dom";
 import ShinyText from "./shinyText";
 
-export type messageList = { role: string; content: string }[];
+export type messageList = { role: string; content: string; id: string }[];
 
 const MessageList = ({
   messages,
@@ -26,12 +26,17 @@ const MessageList = ({
         const videoId = extractYouTubeId(msg.content);
         return (
           <motion.li
-            key={msg.content + index}
+            key={msg.id}
             initial={{ opacity: 0, left: -10 }}
             animate={{
               opacity: 1,
               left: 0,
-              transition: { delay: 0.1 * (messages.length - index) },
+              transition: {
+                delay:
+                  index >= messages.length - 10
+                    ? 0.1 * (messages.length - index)
+                    : 0.05 * (messages.length - index),
+              },
             }}
             className={clsx("rounded-xl p-2 break-words relative", {
               // "bg-zinc-50": msg.role === "user",

@@ -14,11 +14,13 @@
     "@tailwindcss/vite": "^4.1.4",
     "clsx": "^2.1.1",
     "javascript-time-ago": "^2.5.11",
+    "lucide-react": "^0.507.0",
     "motion": "^12.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.5.3",
     "react-time-ago": "^7.3.3",
+    "react-voice-visualizer": "^2.0.8",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.4"
   },

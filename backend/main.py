@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Response, Cookie
+from fastapi import FastAPI, File, Response, Cookie, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from openai import OpenAI
 from youtube_downloader import download_audio
 from transcriber import transcribe_audio
 from embedder import split_text, create_vectorstore
@@ -24,17 +25,6 @@ app.add_middleware(
 )
 
 
-# @app.post("/process_video/")
-# async def process_video(url: str):
-#     audio_path = download_audio(url)
-#     transcript = transcribe_audio(audio_path)
-#     chunks = split_text(transcript)
-#     create_vectorstore(chunks)
-#     global agent
-#     agent = create_agent()
-#     return {"message": "Video processed and agent ready."}
-
-
 class Message(BaseModel):
     chat_id: str
     user_message: str
@@ -43,28 +33,13 @@ class Message(BaseModel):
 chat_sessions: Dict[str, Dict] = {}
 
 
-# @app.post("/chat")
-# async def chat(msg: Message):
-#     chat_id = msg.chat_id
-#     user_msg = msg.user_message
-
-#     if chat_id not in chat_sessions:
-#         # Create new chat memory and vectorstore
-#         chat_sessions[chat_id] = {
-#             "history": [],
-#             "vectorstore": [],  # Replace with Faiss/Chroma/etc.
-#         }
-
-#     session = chat_sessions[chat_id]
-#     session["history"].append({"role": "user", "content": user_msg})
-
-#     # Replace below with real agent response
-#     # agent = create_agent()
-#     # agent_response = agent.run(user_msg)
-#     agent_response = f"echo: {user_msg}"
-#     session["history"].append({"role": "agent", "content": agent_response})
-
-#     return {"response": agent_response}
+@app.post("/transcribe")
+async def transcribe(audio: UploadFile = File(...)):
+    audio.file.seek(0)
+    transciption = OpenAI().audio.transcriptions.create(
+        model="whisper-1", file=(audio.filename, audio.file, audio.content_type)
+    )
+    return {"text": transciption.text}
 
 
 @app.post("/chat")
@@ -72,23 +47,11 @@ async def chat_endpoint(msg: Message):
     chat_id = msg.chat_id
     user_input = msg.user_message
 
-    # # Step 1: Optional video transcription if needed
-    # youtube_url = extract_youtube_url(user_input)
-    # if youtube_url:
-    #     transcribe_and_save(chat_id, youtube_url)  # adds to vectorstore and DB
-
-    # Step 2: Create agent with loaded memory and vectorstore
     agent = create_agent(chat_id)
-
-    # Step 3: Agent generates reply
     agent_reply = agent.run(user_input)
-
-    # Step 4: Save conversation to DB
     save_message(chat_id, "user", user_input)
     save_message(chat_id, "agent", agent_reply)
-
-    # Step 5: Return response
-    return {"response": agent_reply}
+    return {"response": agent_reply, "id": str(uuid4())}
 
 
 @app.get("/start")

@@ -129,7 +129,10 @@ def get_chat_history(chat_id: str) -> List[dict]:
     # Returns [{'role': 'user', 'content': '...'}, ...]
     with sqlite3.connect("chat.db") as conn:
         cursor = conn.execute(
-            "SELECT role, content FROM messages WHERE chat_id = ? ORDER BY timestamp",
+            "SELECT role, content, id FROM messages WHERE chat_id = ? ORDER BY timestamp",
             (chat_id,),
         )
-        return [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+        return [
+            {"role": row[0], "content": row[1], "id": row[2]}
+            for row in cursor.fetchall()
+        ]
