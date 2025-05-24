@@ -1,6 +1,6 @@
 const Logo = () => {
   return (
-    <div className="w-[50px] h-[50px] shrink-0 bg-gradient-to-r from-emerald-800 to-emerald-500 mask-logo bg-cover bg-center" />
+    <div className="w-[30px] h-[30px] shrink-0 bg-gradient-to-r from-emerald-700 to-emerald-600 mask-logo bg-cover bg-center" />
   );
 };
 

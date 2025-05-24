@@ -2,6 +2,10 @@ import Chat from "./components/chat";
 import Sidebar from "./components/sidebar";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+// @ts-expect-error the import isnt working
+import "@fontsource/philosopher"; // npm install @fontsource/philosopher
+// @ts-expect-error the import isnt working
+import "@fontsource/nunito"; // npm install @fontsource/philosopher
 
 TimeAgo.addDefaultLocale(en);
 

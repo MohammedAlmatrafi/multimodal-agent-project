@@ -66,7 +66,9 @@ def build_youtube_rag_tool(chat_id: str) -> Tool:
             if len(db.get()["ids"]) == 0:
                 return "I wasn't able to retrieve any specific information about the video you mentioned. If you provide the URL of the video, I can help you."
             else:
-                return db.as_retriever().get_relevant_documents(query)
+                results = db.similarity_search_with_score(query, k=10)
+                threshold = 0.5
+                return [doc.page_content for doc, score in results if score > threshold]
         except Exception as e:
             return "Sorry some error happened."
 

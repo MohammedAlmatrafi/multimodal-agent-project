@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+body {
+  font-family: "Nunito";
+}
 .mask-logo {
   -webkit-mask-image: url("/falconAI-transparent.png");
   mask-image: url("/falconAI-transparent.png");
@@ -12,8 +15,8 @@
 }
 
 .fade-text {
-  -webkit-mask-image: linear-gradient(to left, transparent 10%, black 50%);
-  mask-image: linear-gradient(to left, transparent 10%, black 50%);
+  -webkit-mask-image: linear-gradient(to left, transparent 10%, black 20%);
+  mask-image: linear-gradient(to left, transparent 20%, black 50%);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;

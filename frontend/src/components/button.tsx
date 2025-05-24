@@ -12,7 +12,7 @@ const Button: React.FC<ButtonProps> = ({ onClick, children, className }) => {
     <button
       onClick={onClick}
       className={twMerge(
-        `bg-zinc-100 rounded-xl py-1 px-3 cursor-pointer active:scale-95`,
+        `bg-zinc-50 hover:bg-zinc-100 rounded-xl py-1 px-3 cursor-pointer active:scale-95 duration-100`,
         className
       )}
     >
